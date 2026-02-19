@@ -24,7 +24,6 @@
 Создаем файл `multi-app-deployment.yaml`. Мы используем `multitool` с командой `sleep`, чтобы контейнер не завершился немедленно.
 
 ```yaml
-# multi-app-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -76,7 +75,6 @@ microk8s kubectl get pods -l app=diagnostic-app
 ### ` Создаем файл multi-app-service.yaml. `
 
 ```yaml
-# multi-app-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
