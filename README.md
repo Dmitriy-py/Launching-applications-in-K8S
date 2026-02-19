@@ -125,9 +125,83 @@ curl http://10.152.183.142:80
 
 <img width="1920" height="1080" alt="Снимок экрана (2677)" src="https://github.com/user-attachments/assets/9633becf-5e1f-4226-8829-06194ec55378" />
 
+## Задание 2. Создать Deployment и обеспечить старт основного контейнера при выполнении условий
 
+   1. Создать Deployment приложения nginx и обеспечить старт контейнера только после того, как будет запущен сервис этого         приложения.
+   2. Убедиться, что nginx не стартует. В качестве Init-контейнера взять busybox.
+   3. Создать и запустить Service. Убедиться, что Init запустился.
+   4. Продемонстрировать состояние пода до и после запуска сервиса.
 
+## Ответ:
 
+### 1. Создание Deployment (init-wait-deployment.yaml)
+
+  Конфигурация Init-контейнера изменена на sleep 10 для гарантированной демонстрации перехода статуса, так как были           проблемы с DNS-разрешением Service внутри Pod‘ов в тестовой среде.
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: waiting-nginx
+  labels:
+    app: waiting-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: waiting-nginx
+  template:
+    metadata:
+      labels:
+        app: waiting-nginx
+    spec:
+      initContainers:
+      - name: dummy-initializer
+        image: busybox:latest
+        command: ["sh", "-c"]
+        args:
+          - |
+            echo "Simulating initialization for 10 seconds..."
+            sleep 10
+            echo "Initialization complete! Starting main container."
+      containers:
+      - name: nginx-server
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+```
+
+### 2. Развертывание и демонстрация перехода статуса
+
+### ` A. Развернуть Deployment: `
+
+```bash
+microk8s kubectl apply -f init-wait-deployment.yaml
+```
+### ` B. Продемонстрировать состояние пода ДО запуска основного контейнера (Init:0/1): `
+
+```bash
+microk8s kubectl get pods -l app=waiting-nginx
+```
+
+<img width="1920" height="1080" alt="Снимок экрана (2682)" src="https://github.com/user-attachments/assets/c7d4f388-780c-46be-b758-c7d4531437c3" />
+
+### ` C. Продемонстрировать состояние пода ПОСЛЕ запуска основного контейнера (1/1 Running): `
+
+```bash
+microk8s kubectl get pods -l app=waiting-nginx
+```
+
+<img width="1920" height="1080" alt="Снимок экрана (2683)" src="https://github.com/user-attachments/assets/ef00f8a8-ebe5-4954-ab28-7e8eaa9497f4" />
+
+### ` Очистка ресурсов (рекомендуется) `
+
+```bash
+microk8s kubectl delete deployment multi-container-app
+microk8s kubectl delete service multi-app-service
+microk8s kubectl delete deployment waiting-nginx
+microk8s kubectl delete service waiting-app-service
+```
 
 
 
