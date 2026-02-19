@@ -194,7 +194,7 @@ microk8s kubectl get pods -l app=waiting-nginx
 
 <img width="1920" height="1080" alt="Снимок экрана (2683)" src="https://github.com/user-attachments/assets/ef00f8a8-ebe5-4954-ab28-7e8eaa9497f4" />
 
-### ` Очистка ресурсов (рекомендуется) `
+### ` Очистка ресурсов `
 
 ```bash
 microk8s kubectl delete deployment multi-container-app
